@@ -30,15 +30,14 @@ class LostItemController extends Controller
      */
     public function store(Request $request)
     {
-        // バリデーション
         $data = $request->validate([
-            'name'         => 'required|string|max:255',
-            'category'     => 'required|string|max:255',
-            'color'        => 'nullable|string|max:255',
-            'found_place'  => 'required|string|max:255',
-            'found_date'   => 'required|date',
-            'image'        => 'required|image|max:2048',
-            'description'  => 'nullable|string',
+            'name'          => 'required|string|max:255',
+            'category'      => 'required|string|max:255',
+            'color'         => 'nullable|string|max:255',
+            'found_place'   => 'required|string|max:255',
+            'found_date'    => 'required|date',
+            'image'         => 'nullable|image|max:2048',
+            'description'   => 'nullable|string',
         ]);
 
         // 画像保存
@@ -46,13 +45,14 @@ class LostItemController extends Controller
 
         // DB保存
         LostItem::create([
-            'name'        => $data['name'],
-            'category'    => $data['category'],
-            'color'       => $data['color'] ?? null,
-            'found_place' => $data['found_place'],
-            'found_date'  => $data['found_date'],
-            'image_path'  => $path,
-            'description' => $data['description'] ?? null,
+            'name'          => $data['name'],
+            'category'      => $data['category'],
+            'color'         => $data['color'] ?? null,
+            'found_place'   => $data['found_place'],
+            'found_date'    => $data['found_date'],
+            'image_path'    => $path,
+            'description'   => $data['description'] ?? null,
+            'status'        => '保管中',
         ]);
 
         return redirect()
@@ -67,6 +67,52 @@ class LostItemController extends Controller
     {
         $item = LostItem::findOrFail($id);
         return view('lostitems.show', compact('item'));
+    }
+
+    /**
+     * 編集フォーム表示
+     */
+    public function edit($id)
+    {
+        $item = LostItem::findOrFail($id);
+        return view('lostitems.edit', compact('item'));
+    }
+
+    /**
+     * 更新処理
+     */
+    public function update(Request $request, $id)
+    {
+        $item = LostItem::findOrFail($id);
+
+        $data = $request->validate([
+            'name'          => 'required|string|max:255',
+            'category'      => 'required|string|max:255',
+            'color'         => 'nullable|string|max:255',
+            'found_place'   => 'required|string|max:255',
+            'found_date'    => 'required|date',
+            'image'         => 'nullable|image|max:2048', 
+            'description'   => 'nullable|string',
+            'status'        => 'required|string|in:保管中,返却済,破棄済', // 許容されるステータス
+        ]);
+
+        // 画像の更新処理
+        if ($request->hasFile('image')) {
+            // 古い画像を削除
+            if ($item->image_path && Storage::disk('public')->exists($item->image_path)) {
+                Storage::disk('public')->delete($item->image_path);
+            }
+            // 新しい画像を保存
+            $data['image_path'] = $request->file('image')->store('lost_items', 'public');
+        }
+
+        // DBを更新
+        // $data配列には image_path が含まれる可能性があるため、そのまま update に渡す
+        $item->update($data);
+
+        return redirect()
+            ->route('lostitems.show', $item->id)
+            ->with('success', '落とし物情報を更新しました');
     }
 
     /**
