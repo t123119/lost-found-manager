@@ -7,5 +7,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('items/search', [LostItemController::class, 'search'])->name('lostitems.search');
+Route::get('items/search', [LostItemController::class, 'search'])->name('items.search');
 Route::resource('items', LostItemController::class);
