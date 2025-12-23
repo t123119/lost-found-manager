@@ -40,8 +40,11 @@ class LostItemController extends Controller
             'description'   => 'nullable|string',
         ]);
 
-        // 画像保存
-        $path = $request->file('image')->store('lost_items', 'public');
+        // 画像がアップロードされた場合のみ保存処理を行う
+        $path = null;
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('lost_items', 'public');
+        }
 
         // DB保存
         LostItem::create([
@@ -50,13 +53,14 @@ class LostItemController extends Controller
             'color'         => $data['color'] ?? null,
             'found_place'   => $data['found_place'],
             'found_date'    => $data['found_date'],
-            'image_path'    => $path,
+            'image_path'    => $path, // 画像がない場合はnullが入る
             'description'   => $data['description'] ?? null,
             'status'        => '保管中',
         ]);
 
+        // 完了画面（items.complete）へリダイレクト
         return redirect()
-            ->route('items.index')
+            ->route('items.complete')
             ->with('success', '落とし物を登録しました');
     }
 
@@ -85,7 +89,6 @@ class LostItemController extends Controller
     {
         $item = LostItem::findOrFail($id);
 
-        // 1. バリデーション
         $validated = $request->validate([
             'name'        => 'required|string|max:255',
             'category'    => 'required|string|max:255',
@@ -97,22 +100,16 @@ class LostItemController extends Controller
             'status'      => 'required|string|in:保管中,返却済,破棄済',
         ]);
 
-        // 2. ファイル以外のデータを更新用配列として準備
-        // 'image' キーはファイルオブジェクトなので、これを除外した配列を作る
         $updateData = $request->except('image');
 
-        // 3. 画像の更新処理
         if ($request->hasFile('image')) {
-            // 古い画像があれば削除
             if ($item->image_path && Storage::disk('public')->exists($item->image_path)) {
                 Storage::disk('public')->delete($item->image_path);
             }
-            // 新しい画像を保存し、パスを更新用配列に追加
             $path = $request->file('image')->store('lost_items', 'public');
             $updateData['image_path'] = $path;
         }
 
-        // 4. DBを更新
         $item->update($updateData);
 
         return redirect()
@@ -148,13 +145,12 @@ class LostItemController extends Controller
     }
 
     /**
-     * 削除処理（画像も削除）
+     * 削除処理
      */
     public function destroy($id)
     {
         $item = LostItem::findOrFail($id);
 
-        // 画像削除
         if ($item->image_path && Storage::disk('public')->exists($item->image_path)) {
             Storage::disk('public')->delete($item->image_path);
         }

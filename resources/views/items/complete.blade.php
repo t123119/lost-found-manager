@@ -2,24 +2,28 @@
 
 @section('content')
 
-<div class="create-card" style="text-align:center;">
+<div class="complete-container">
 
-    <h2 style="color:#2a8f6a; margin-bottom:15px;">
-        ✅ 登録が完了しました
-    </h2>
+    <div class="complete-icon">✅</div>
 
-    <p style="margin-bottom:25px;">
-        落とし物情報を登録しました。<br>
-        内容は運営の承認後に一覧へ表示されます。
-    </p>
+    <h2 class="complete-title">登録が完了しました</h2>
 
-    <div class="form-buttons" style="justify-content:center;">
+    <div class="complete-text">
+        <p>
+            落とし物情報をシステムに登録しました。<br>
+        </p>
+        <p style="font-size: 0.9em; color: #718096;">
+            ※内容は確認後に一覧へ反映されます。
+        </p>
+    </div>
+
+    <div class="center-buttons">
         <a href="{{ route('items.index') }}" class="btn-cancel">
-            一覧へ戻る
+            📋 一覧へ戻る
         </a>
 
         <a href="{{ route('items.create') }}" class="btn-submit">
-            続けて登録する
+            ＋ 続けて登録する
         </a>
     </div>
 
