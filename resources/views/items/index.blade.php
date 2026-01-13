@@ -6,15 +6,15 @@
 <div class="description-grid">
     <div class="desc-card">
         <h4>🔍 検索</h4>
-        <p>キーワードやカテゴリから探せます。</p>
+        <p>キーワードやカテゴリから拾得物を検索できます。</p>
     </div>
     <div class="desc-card">
         <h4>📋 一覧</h4>
-        <p>最新の拾得物を確認できます。</p>
+        <p>登録されている拾得物の一覧を確認できます。</p>
     </div>
     <div class="desc-card">
         <h4>＋ 登録</h4>
-        <p>拾得物の特徴を登録します。</p>
+        <p>新しい拾得物を登録します。</p>
     </div>
 </div>
 

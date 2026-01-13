@@ -31,7 +31,7 @@
 
         <div class="form-buttons">
             <button type="submit" class="btn-submit">🔍 この条件で検索する</button>
-            <a href="{{ route('items.index') }}" class="btn-cancel">リセットして一覧に戻る</a>
+            <a href="{{ route('items.index') }}" class="btn-cancel">一覧に戻る</a>
         </div>
     </form>
 </div>
